@@ -114,83 +114,83 @@ const handleLogin = async () => {
     if (error) { setError(error.message); return; }
 // tells the user to verify their email before they log in
     setMsg('Check your email for a confirmation link, then log in.');
-// returns user to login screen
+{/* returns user to login screen */}
     setMode('login');
   };
 
-// sends a password reset email to user
+{/* sends a password reset email to user */}
   const handleForgot = async () => {
-// checks that user has entered an email address
+// checks that user has entered an email address 
     if (!email.includes('@')) { setError('Enter your email first.'); return; }
-// displays the loading indicator and clears old msgs
+// displays the loading indicator and clears old msgs 
     setLoading(true); reset();
-// requests a password reset email from Supabase
+{/* requests a password reset email from Supabase */}
     const { error } = await supabase.auth.resetPasswordForEmail(email);
-// stops displaying the loading indicator
+{/* stops displaying the loading indicator */}
     setLoading(false);
-// displays error message if the request fails
+{/* displays error message if the request fails */}
     if (error) { setError(error.message); return; }
-// informs user that the reset email has been sent
+{/* informs user that the reset email has been sent */}
     setMsg('Password reset email sent - check your inbox.');
   };
 
-// returns the auth screen interface
+{/* returns the auth screen interface */}
   return (
  // keeps the interface within the device's safe display area
     <SafeAreaView style={styles.safe}>
 
-// moves the screen when the keyboard appears so that text remain visible
+{/* moves the screen when the keyboard appears so that text remain visible */}
       <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       style={{ flex: 1 }}
       >
 
-// allows the page to scroll if the keyboard covers anything
+{/* allows the page to scroll if the keyboard covers anything */}
     <ScrollView
         contentContainerStyle={styles.content}
         keyboardShouldPersistTaps="handled"
         >
-// displays the logo on top of the screen
+{/* displays the logo on top of the screen */}
         <View style={styles.logoWrap}>
        <View style={styles.logoPlaceholder}>
         <Text style={styles.logoText}>vv</Text>
         </View>
         </View>
 
-// displays a different heading depending on the current authentication mode
+{/* displays a different heading depending on the current authentication mode */}
         <Text style={styles.heading}>
         {mode === 'login'  ? 'Welcome back.'       :
 mode === 'signup' ? 'Create your account.' :
 'Reset password.'}
 </Text>
 
-// displays a brief description to guide the user through the current action
+{/* displays a brief description to guide the user through the current action */}
 <Text style={styles.subheading}>
 {mode === 'login'  ? 'Log in to your vv account'   :
 mode === 'signup' ? 'Start your study journey'     :
  "We'll send you a reset link"}
  </Text>
 
-// displays the label for the email input 
+{/* displays the label for the email input */}
   <Text style={styles.label}>Email</Text>
-// allows the user to enter email address
+{/* allows the user to enter email address */}
+{/* updates email as the user types and clears old msgs */}
   <TextInput
   style={styles.input}
   placeholder="your@email.com"
   placeholderTextColor="#555"
   value={email}
-// updates email as the user types and clears old msgs
   onChangeText={t => { setEmail(t); reset(); }}
   autoCapitalize="none"
   keyboardType="email-address"
   autoFocus
   />
-   // only displays the password field when the user logs in or creating an acc
+   {/*only displays the password field when the user logs in or creating an acc */}
           {mode !== 'forgot' && (
             <>
-          // displays the password input label
+          {/* displays the password input label */}
               <Text style={styles.label}>Password</Text>
-          // groups the password field & show/hide button
+          {/* groups the password field & show/hide button */}
               <View style={styles.passWrap}>
                 <TextInput
           // allows the user to enter password
@@ -204,7 +204,7 @@ mode === 'signup' ? 'Start your study journey'     :
                   secureTextEntry={!showPass}
                   autoCapitalize="none"
                 />
-          // toggles whether password is visible
+        {/* toggles whether password is visible*/}
                 <TouchableOpacity onPress={() => setShowPass(v => !v)} style={styles.eyeBtn}>
                  <Text style={styles.eyeTxt}>
                  {showPass ? 'Hide' : 'Show'}
@@ -214,23 +214,24 @@ mode === 'signup' ? 'Start your study journey'     :
             </>
           )}
           
-          // displays error message when auth fails
+          {/* displays error message when auth fails */}
 
           {error ? <Text style={styles.error}>{error}</Text> : null}
-          // displays success message after completing an action
+          
+          {/* displays success message after completing an action */}
           {msg ? <Text style={styles.success}>{msg}</Text> : null}
-// main authentication button performs login, signup or password reset depends on current screen
+    {/* main authentication button performs login, signup or password reset depends on current screen */}
           <TouchableOpacity
             style={styles.mainBtn}
             onPress={mode === 'login' ? handleLogin : mode === 'signup' ? handleSignup : handleForgot}
             disabled={loading}
           >
-            // displays a loading spinner while waiting for Supabase 
+            {/* displays a loading spinner while waiting for Supabase */}
             {loading
               ? <ActivityIndicator color="#fff" />
               // displays the appropriate button text
               : <Text style={styles.mainBtnTxt}>
-              // only displayed on the login screen which allows users to reset their password 
+              {/* only displayed on the login screen which allows users to reset their password */}
                   {mode === 'login'  ? 'Log in':
                    mode === 'signup' ? 'Create account':
                      'Send reset link'}
@@ -247,11 +248,11 @@ mode === 'signup' ? 'Start your study journey'     :
 
           {mode !== 'forgot' ? (
             <View style={styles.switchRow}>
-          // explanatory text shown before the switch button
+          {/* explanatory text shown before the switch button */}
               <Text style={styles.switchText}>
                 {mode === 'login' ? "Don't have an account? " : 'Already have an account? '}
               </Text>
-          // switches between the login & signup screens
+          {/* switches between the login & signup screens */}
               <TouchableOpacity onPress={() => { setMode(mode === 'login' ? 'signup' : 'login'); reset(); }}>
                 <Text style={styles.switchLink}>
                   {mode === 'login' ? 'Sign up' : 'Log in'}
@@ -265,7 +266,7 @@ mode === 'signup' ? 'Start your study journey'     :
               <Text style={styles.switchLink}>← back to login</Text>
             </TouchableOpacity>
           )}
-// displays application's screen legal notice 
+{/* displays application's screen legal notice */}
           <Text style={styles.legal}>
             By continuing you agree to our{' '}
             <Text style={styles.legalLink}>Terms</Text>
@@ -273,7 +274,7 @@ mode === 'signup' ? 'Start your study journey'     :
             <Text style={styles.legalLink}>Privacy Policy</Text>
           </Text>
 
-// displays the application copyright 
+{/* displays the application copyright */}
           <Text style={styles.copyright}>© 2026 vv</Text>
 
         </ScrollView>
@@ -282,7 +283,7 @@ mode === 'signup' ? 'Start your study journey'     :
   );
 }
 
-// defines all styles used by the auth screen
+{/* defines all styles used by the auth screen */}
 const styles = StyleSheet.create({
   // styles the safe area container
   safe: { flex: 1, backgroundColor: '#0a0a0a' },
