@@ -1,0 +1,38 @@
+{
+  "expo": {
+    "name": "vv",
+    "slug": "vv-app",
+    "version": "2.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "dark",
+   
+    "splash": {
+      "backgroundColor": "#0b1220",
+      "resizeMode": "contain"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/logo.png",
+        "backgroundColor": "#0b1220"
+      },
+      "package": "com.vienna.vvapp",
+      "permissions": [
+        "android.permission.READ_EXTERNAL_STORAGE",
+        "android.permission.READ_MEDIA_IMAGES"
+      ]
+    },
+    "plugins": [
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Allow vv to access your photos to set a profile picture."
+        }
+      ],
+      "expo-font",
+      "expo-web-browser"
+    ]
+  }
+}
