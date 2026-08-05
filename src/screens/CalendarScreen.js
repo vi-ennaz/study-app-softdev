@@ -11,15 +11,21 @@ import { spacing, radius } from '../theme';
 
 const DAYS = ['Su','Mo','Tu','We','Th','Fr','Sa'];
 
+// Stores the available event categories used throughout the calendar
+// each type contains an icon, colour and cafe themed label for display
 const EVENT_TYPES = [
   { id: 'deadline', label: 'deadline', cafeLabel: 'espresso',  icon: '☕', color: '#b04040' },
   { id: 'exam', label: 'exam', cafeLabel: 'matcha', icon: '🍵', color: '#5a8a50' },
   { id: 'reminder', label: 'reminder', cafeLabel: 'latte', icon: '🥛', color: '#b07830' },
   { id: 'event', label: 'event', cafeLabel: 'cold brew', icon: '✦',  color: '#405890' },
 ];
+// converts the EVENT_TYPES array into lookup objects for faster access
+// instead of searching the array every time an event is displayed
 const TYPE_MAP = Object.fromEntries(EVENT_TYPES.map(t => [t.id, t]));
 const TYPE_COLOR = Object.fromEntries(EVENT_TYPES.map(t => [t.id, t.color]));
 
+// Reusable decorative divider displayed throughout pop up windows
+// to maintain the cafe receipt theme and improve visual consistency 
 function Dashes({ color }) {
   return (
     <Text style={{ color: color || '#c0b4a4', fontSize: 10, letterSpacing: 0.5, textAlign: 'center', marginVertical: 8 }}>
@@ -29,9 +35,12 @@ function Dashes({ color }) {
 }
 
 function TodayPopup({ events, onClose, onAdd, colors, border, ink, muted, accent }) {
+  // Creates animated values used to fade and slide the popup
+// into view when it is opened
   const fadeAnim = React.useRef(new Animated.Value(0)).current;
   const slideAnim = React.useRef(new Animated.Value(30)).current;
 
+  // runs the open animation once when the popup is displayed
   useEffect(() => {
     Animated.parallel([
       Animated.timing(fadeAnim, { toValue: 1, duration: 320, useNativeDriver: true }),
@@ -39,6 +48,7 @@ function TodayPopup({ events, onClose, onAdd, colors, border, ink, muted, accent
     ]).start();
   }, []);
 
+// plays the closing animation before removing the popup from the screen
   const dismiss = () => {
     Animated.parallel([
       Animated.timing(fadeAnim, { toValue: 0, duration: 200, useNativeDriver: true }),
@@ -59,6 +69,8 @@ function TodayPopup({ events, onClose, onAdd, colors, border, ink, muted, accent
         <Text style={[pop.title, { color: muted }]}>✦  today's orders  ✦</Text>
         <Text style={[pop.sub, { color: muted }]}>{format(new Date(), 'EEEE, d MMMM')}</Text>
         <Dashes color={border} />
+
+{/* Displays all events scheduled for today, if no events exist, an empty state msg is shown instead */}
 
         {events.length > 0 ? (
           events.map(ev => {
@@ -94,20 +106,23 @@ function TodayPopup({ events, onClose, onAdd, colors, border, ink, muted, accent
       </Animated.View>
     </Modal>
   );
-}
+}     
 
 function EventModal({ initial, subjects, onSave, onDelete, onClose, colors, border, ink, muted, accent }) {
+ // Stores the values entered by the user while creating or editing a calendar event
   const [title, setTitle] = useState(initial?.title || '');
   const [subject, setSubject] = useState(initial?.subject || '');
   const [date, setDate] = useState(initial?.date || format(new Date(), 'yyyy-MM-dd'));
   const [time, setTime] = useState(initial?.time || '');
   const [type, setType] = useState(initial?.type || 'deadline');
 
+  // Validates that an event title has been entered before saving the event to the application state
   const save = () => {
     if (!title.trim()) { Alert.alert('Enter a title'); return; }
     onSave({ title, subject, date, time, type });
     onClose();
   };
+  // Confirms the deletion request before permanently removing the selected event
   const del = () => Alert.alert('Delete?', '', [
     { text: 'Cancel', style: 'cancel' },
     { text: 'Delete', style: 'destructive', onPress: () => { onDelete(); onClose(); } },
@@ -135,6 +150,7 @@ function EventModal({ initial, subjects, onSave, onDelete, onClose, colors, bord
           />
 
           <Text style={[calS.fieldLabel, { color: muted }]}>category</Text>
+          {/* Allows the user to select an event category, The selected category changes the event's icon and colour */}
           <View style={calS.typeRow}>
             {EVENT_TYPES.map(t => (
               <TouchableOpacity key={t.id} onPress={() => setType(t.id)}
@@ -153,7 +169,10 @@ function EventModal({ initial, subjects, onSave, onDelete, onClose, colors, bord
                 subject === '' && { backgroundColor: accent + '22', borderColor: accent + '60' }]}>
               <Text style={[calS.typeChipTxt, { color: subject === '' ? accent : muted }]}>none</Text>
             </TouchableOpacity>
+            {/* Displays all available subjects so the user can associate an event with a specific study subject */}
             {(subjects || []).map(s => (
+
+
               <TouchableOpacity key={s.name || s} onPress={() => setSubject(s.name || s)}
                 style={[calS.typeChip, { borderColor: border, backgroundColor: colors.chipBg, marginRight: 8 },
                   subject === (s.name || s) && { backgroundColor: (s.color || accent) + '22', borderColor: (s.color || accent) + '60' }]}>
@@ -182,6 +201,7 @@ function EventModal({ initial, subjects, onSave, onDelete, onClose, colors, bord
 
           <View style={calS.modalActions}>
             <TouchableOpacity style={[calS.saveBtn, { backgroundColor: accent }]} onPress={save}>
+              {/* Saves the new or edited event and updates the application's stored calendar data */}
               <Text style={[calS.saveBtnTxt]}>
                 {initial ? 'save order' : 'place order  →'}
               </Text>
@@ -197,20 +217,20 @@ function EventModal({ initial, subjects, onSave, onDelete, onClose, colors, bord
     </Modal>
   );
 }
-
+// Global State Contexts
 export default function CalendarScreen() {
-  const { state, dispatch } = useApp();
-  const { isDark } = useTheme();
+  const { state, dispatch } = useApp(); // Event & subject global state
+  const { isDark } = useTheme(); // Dark/Light mode theme state
   const { events, subjects } = state;
-
-  const [month, setMonth] = useState(new Date());
-  const [selected, setSelected] = useState(format(new Date(), 'yyyy-MM-dd'));
-  const [showModal, setShowModal] = useState(false);
-  const [editEv, setEditEv] = useState(null);
-  const [showPopup, setShowPopup] = useState(true);   
-
+// Local Screen States
+  const [month, setMonth] = useState(new Date()); // Currently displayed calendar month
+  const [selected, setSelected] = useState(format(new Date(), 'yyyy-MM-dd')); // Selected date string
+  const [showModal, setShowModal] = useState(false); // Add/Edit Modal visibility toggle
+  const [editEv, setEditEv] = useState(null); // Holds target event object during edit operations
+  const [showPopup, setShowPopup] = useState(true); // Today's summary popup visibility
+// Helper Date Variable
   const today = format(new Date(), 'yyyy-MM-dd');
-
+// Dynamic colour palette based on active theme 
   const bg  = isDark ? '#21201f': '#faf5ee';
   const paper = isDark ? '#2e2c2a': '#fffdf7';
   const ink = isDark ? '#d1c9bb': '#1e160a';
@@ -222,23 +242,31 @@ export default function CalendarScreen() {
 
   const themeColors = { paper, inputBg, chipBg };
 
+// Calendar Date Computations
   const start = startOfMonth(month);
   const days = eachDayOfInterval({ start, end: endOfMonth(month) });
   const padDays = start.getDay();
-
-  const eventDates = new Set(events.map(e => e.date));
+// Filtering & queries 
+  const eventDates = new Set(events.map(e => e.date)); // Quick existence lookup
   const selectedEvents = events.filter(e => e.date === selected);
   const todayEvents = events.filter(e => e.date === today && !e.done);
   const upcoming = events.filter(e => !e.done && e.date >= today).slice(0, 6);
 
+  // Navigation Controls 
+  /** Moves view to previous month */
   const prev = () => { const d = new Date(month); d.setMonth(d.getMonth() - 1); setMonth(d); };
+  /** Moves view to next month */
   const next = () => { const d = new Date(month); d.setMonth(d.getMonth() + 1); setMonth(d); };
-
+/*** Dispatches create or update operations to global reducer
+   * Replaces existing event by deleting old payload first if editing */
   const handleSave = (data) => {
     if (editEv) dispatch({ type: 'DELETE_EVENT', payload: editEv.id });
     dispatch({ type: 'ADD_EVENT', payload: data });
   };
-
+/**
+   * Calculates relative days remaining for upcoming events
+   * @param {string} date - ISO Date format (YYYY-MM-DD)
+   * @returns {string} readable deadline proximity status */
   const daysLeftLabel = (date) => {
     const diff = Math.ceil((new Date(date) - new Date(today)) / 86400000) + 1;
     if (diff <= 0)  return 'overdue';
@@ -250,12 +278,13 @@ export default function CalendarScreen() {
   return (
     <SafeAreaView style={[calS.safe, { backgroundColor: bg }]} edges={['top']}>
       <ScrollView contentContainerStyle={calS.content} showsVerticalScrollIndicator={false}>
-
+ {/* Screen Title Banner and Global "Add Event" Trigger */}
         <View style={calS.header}>
           <View>
             <Text style={[calS.storeName, { color: muted }]}>the study café</Text>
             <Text style={[calS.title, { color: ink }]}>café planner</Text>
           </View>
+  {/* Opens Modal in "Create Mode" by clearing edit state */}
           <TouchableOpacity
             style={[calS.addBtn, { backgroundColor: accent }]}
             onPress={() => { setEditEv(null); setShowModal(true); }}
@@ -265,29 +294,31 @@ export default function CalendarScreen() {
         </View>
 
         <View style={[calS.receiptCard, { backgroundColor: paper, borderColor: border }]}>
+          {/* Visual hole header decoration */}
           <View style={[pop.punchRow, { marginBottom: 12 }]}>
             {[0,1,2,3,4,5,6,7].map(i => <View key={i} style={[pop.punch, { borderColor: border }]} />)}
           </View>
 
           <Text style={[calS.receiptHeader, { color: muted }]}>☕  select your schedule  ☕</Text>
           <Dashes color={border} />
-
           <View style={calS.monthNav}>
+            // * Decrements active month state 
             <TouchableOpacity style={[calS.navBtn, { backgroundColor: accent + '22', borderColor: accent + '40' }]} onPress={prev}>
               <Text style={[calS.navArrow, { color: accent }]}>←</Text>
+              // * Increments active month state
             </TouchableOpacity>
             <Text style={[calS.monthTitle, { color: ink }]}>{format(month, 'MMMM yyyy').toUpperCase()}</Text>
             <TouchableOpacity style={[calS.navBtn, { backgroundColor: accent + '22', borderColor: accent + '40' }]} onPress={next}>
               <Text style={[calS.navArrow, { color: accent }]}>→</Text>
             </TouchableOpacity>
           </View>
-
+// Day of the Week column headers 
           <View style={calS.dayHdrs}>
             {DAYS.map(d => (
               <Text key={d} style={[calS.dayHdr, { color: muted }]}>{d}</Text>
             ))}
           </View>
-
+// Monthly date grid: renders padding cells + date buttons 
           <View style={calS.grid}>
             {Array.from({ length: padDays }, (_, i) => <View key={`p${i}`} style={calS.cell} />)}
             {days.map(day => {
@@ -305,6 +336,7 @@ export default function CalendarScreen() {
                <Text style={[calS.cellNum, { color: ink }, isTod && { color: accent, fontWeight: '800' }, isSel && { color: '#fff', fontWeight: '800' }]}>
               {day.getDate()}
               </Text>
+              {/* Urgent deadlines render 'Coffee' text; regular events render emoji */}
               {hasEv && (
               <Text style={{ fontSize: 7, color: urgent ? (isSel ? '#fff' : TYPE_COLOR.deadline) : (isSel ? '#fff' : accent) }}>
               {urgent ? 'Coffee' : '✦'}
@@ -316,13 +348,15 @@ export default function CalendarScreen() {
           </View>
 
           <Dashes color={border} />
+          
+          {/* Section header for selected day's events */}
 
           <Text style={[calS.orderTitle, { color: muted }]}>
             {selected === today
               ? "TODAY'S ORDERS"
               : `ORDER #${format(parseISO(selected), 'd MMM').toUpperCase()}`}
           </Text>
-
+//  List of events scheduled for the selected date 
           {selectedEvents.length > 0 ? (
             selectedEvents.map(ev => {
               const t = TYPE_MAP[ev.type] || TYPE_MAP.event;
@@ -340,6 +374,7 @@ export default function CalendarScreen() {
                       {t.cafeLabel}{ev.subject ? ` · ${ev.subject}` : ''}{ev.time ? ` · ${ev.time}` : ''}
                     </Text>
                   </View>
+                  {/* Completion toggle button */}
                   <TouchableOpacity
                     onPress={() => dispatch({ type: 'TOGGLE_EVENT_DONE', payload: ev.id })}
                     style={[calS.checkCircle, { borderColor: ev.done ? t.color : border, backgroundColor: ev.done ? t.color + '22' : 'transparent' }]}
@@ -350,6 +385,7 @@ export default function CalendarScreen() {
               );
             })
           ) : (
+            /* Empty state fallback when no items exist for the selected date */
             <View style={[calS.noEvs]}>
               <Text style={[calS.noEvsTxt, { color: muted }]}>nothing on the menu today</Text>
               <TouchableOpacity onPress={() => { setEditEv(null); setShowModal(true); }}>
@@ -361,11 +397,11 @@ export default function CalendarScreen() {
           )}
 
           <Dashes color={border} />
-
+{/* Bottom action button */}
           <TouchableOpacity style={[calS.placeBtn, { backgroundColor: accent }]} onPress={() => { setEditEv(null); setShowModal(true); }}>
             <Text style={calS.placeBtnTxt}>place new order  →</Text>
           </TouchableOpacity>
-
+{/* Visual hole footer decoration */}
           <View style={[pop.punchRow, { marginTop: 16 }]}>
             {[0,1,2,3,4,5,6,7].map(i => <View key={i} style={[pop.punch, { borderColor: border }]} />)}
           </View>
