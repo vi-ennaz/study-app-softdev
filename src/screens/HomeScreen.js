@@ -152,7 +152,8 @@ export default function HomeScreen({ navigation }) {
       ? <TouchableOpacity onPress={onPress} activeOpacity={0.78}>{inner}</TouchableOpacity>
       : inner;
   };
-
+// Render the main home screen layout, including the header, cards for study progress, notes, study corner, upcoming orders and user stats
+// Each card displays relevant information and actions for the user to interact with 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: bg }} edges={['top']}>
       <ScrollView contentContainerStyle={rc.scroll} showsVerticalScrollIndicator={false}>
@@ -164,7 +165,7 @@ export default function HomeScreen({ navigation }) {
           </Text>
           <Text style={[rc.receiptDate, { color: muted }]}>{receiptDate}</Text>
         </View>
-
+{/* Render the header row with the user's profile picture or fallback avatar, streak information and theme toggle button */}
         <View style={rc.headerRow}>
           <TouchableOpacity onPress={() => navigation?.navigate?.('Profile')}>
             {profile?.photoUri ? (
@@ -179,7 +180,7 @@ export default function HomeScreen({ navigation }) {
           </TouchableOpacity>
 
           <View style={{ flex: 1 }} />
-
+{/* Render the streak pill if the user has a current streak of study days, displaying the number of days in the streak with a fire emoji */}
           {streak > 0 && (
             <View style={[rc.streakPill, { backgroundColor: isDark ? '#32302e' : '#f0e8da', borderColor: border }]}>
               <Text style={[rc.streakTxt, { color: accent }]}>🔥 {streak} day streak</Text>
@@ -197,7 +198,7 @@ export default function HomeScreen({ navigation }) {
         <Card>
           <Text style={[rc.receiptTitle, { color: muted }]}>ORDER #001  ·  today's session</Text>
           <Dashes color={border} />
-
+{/* Render rows for the amount of time studied today, the daily goals and the number of study sessions completed today */}
           <Row label="studied" value={fmtMins(todayMins)} valueColor={todayMins > 0 ? accent : muted} bold={todayMins > 0} ink={ink} muted={muted} />
           <Row label="daily goal" value={fmtMins(goalMins)} ink={ink} muted={muted} />
           <Row label="sessions" value={`${todaySessions.length}`} ink={ink} muted={muted} />
@@ -211,7 +212,7 @@ export default function HomeScreen({ navigation }) {
           </View>
 
           <Dashes color={border} />
-
+{/* Render a call to action button that navigates the user to the Timer screen to start or continue studying, with the button text changing based on whether the user has studied today */}
           <TouchableOpacity
             onPress={() => navigation?.navigate?.('Timer')}
             style={[rc.ctaBtn, { backgroundColor: accent }]}
@@ -221,13 +222,14 @@ export default function HomeScreen({ navigation }) {
             </Text>
           </TouchableOpacity>
         </Card>
-
+{/* Render a card displaying a motivational quote from the barista, with the quote text styled and centered */}
         <Card>
           <Text style={[rc.receiptTitle, { color: muted }]}>╰┈➤  notes from the barista</Text>
           <Dashes color={border} />
           <Text style={[rc.quoteText, { color: ink }]}>"{quote}"</Text>
         </Card>
-
+{/* Render a card that navigates the user to the Profile screen, displaying information about the user's study corner, including their room level, total hours studied */} 
+{/* and the next unlockable item with the number of hours left to unlock it */}
         <Card onPress={() => navigation?.navigate?.('Profile')}>
           <Text style={[rc.receiptTitle, { color: muted }]}>★  study corner</Text>
           <Dashes color={border} />
@@ -254,6 +256,7 @@ export default function HomeScreen({ navigation }) {
                 bold={daysLeft <= 2}
                 ink={ink} muted={muted}
               />
+              {/* Render the subject of the upcoming event if it exists, displaying it in a row with the label "subject" and the value being the subject of the event */}
               {upcomingEvent.subject && <Row label="subject" value={upcomingEvent.subject} ink={ink} muted={muted} />}
             </>
           ) : (
@@ -262,7 +265,7 @@ export default function HomeScreen({ navigation }) {
           <Dashes color={border} />
           <Text style={[rc.tapHint, { color: accent }]}>open calendar  →</Text>
         </Card>
-
+{/* Render a card that navigates the user to the Profile screen, displaying information about the user's stats, including total sessions, total time studied, current streak and number of badges unlocked */}
         <Card onPress={() => navigation?.navigate?.('Profile')}>
           <Text style={[rc.receiptTitle, { color: muted }]}>★  your stats</Text>
           <Dashes color={border} />
@@ -284,7 +287,8 @@ export default function HomeScreen({ navigation }) {
     </SafeAreaView>
   );
 }
-
+// Define the styles for the HomeScreen component using StyleSheet.create, including styles for the scroll view, store header, greeting, receipt date, header row, avatar, streak pill, 
+// theme button, card, rows, progress bar, call to action button, quote text, tap hint, empty hint and footer
 const rc = StyleSheet.create({
   scroll: { paddingHorizontal: 18, paddingTop: 10 },
 
