@@ -8,10 +8,13 @@ import { useApp } from '../context/AppContext';
 import { useTheme } from '../context/ThemeContext';
 import { typography, spacing, radius } from '../theme';
 
+// Format an ISO date string to a more readable format 
 function fmt(iso) {
   const d = new Date(iso);
   return d.toLocaleDateString('en-AU', { day: 'numeric', month: 'short' });
 }
+// NoteEditor component for creating and editing notes, with title, content, subject selection
+// and save/delete functionality
 function NoteEditor({ note, subjects, onSave, onDelete, onClose, colors }) {
   const [title, setTitle] = useState(note?.title   || '');
   const [content, setContent] = useState(note?.content || '');
@@ -19,20 +22,24 @@ function NoteEditor({ note, subjects, onSave, onDelete, onClose, colors }) {
   const [showSubjs, setShowSubjs] = useState(false);
   const contentRef = useRef(null);
 
+  // Determine the accent color based on the selected subject, defaulting to the primary color if no subject is selected
   const selectedSubject = subjects.find(s => s.name === subject);
   const accent = selectedSubject?.color || colors.primary;
 
+// Save the note by calling the onSave callback with the title, content and subject, then close the editor
   const save = () => {
     onSave({ title: title || 'Untitled', content, subject });
     onClose();
   };
+// Prompt the user with a confirmation alert before deleting the note, calling the onDelete callback if confirmed
   const del = () => {
     Alert.alert('Delete note?', 'This cannot be undone.', [
       { text: 'Cancel', style: 'cancel' },
       { text: 'Delete', style: 'destructive', onPress: () => { onDelete(); onClose(); } },
     ]);
   };
-
+// Render the NoteEditor modal with a top bar for actions, subject selection
+// and text inputs for title and content, along with a footer displaying word count and last edited date
   return (
     <Modal visible animationType="slide" onRequestClose={save}>
       <SafeAreaView style={{ flex: 1, backgroundColor: colors.bg, borderTopWidth: 3, borderTopColor: accent }}>
@@ -52,7 +59,7 @@ function NoteEditor({ note, subjects, onSave, onDelete, onClose, colors }) {
               </TouchableOpacity>
             )}
           </View>
-
+{/* Render the subject selection scroll view if showSubjs is true, allowing the user to select a subject for the note */}
           {showSubjs && (
             <ScrollView horizontal showsHorizontalScrollIndicator={false}
               style={[edStyles.subjScroll, { borderBottomColor: colors.border }]}>
@@ -75,7 +82,7 @@ function NoteEditor({ note, subjects, onSave, onDelete, onClose, colors }) {
               ))}
             </ScrollView>
           )}
-
+{/* Render an accent line below the subject selection, using the accent color with reduced opacity */}
           <View style={[edStyles.accentLine, { backgroundColor: accent + '50' }]} />
 
           <ScrollView style={edStyles.edScroll} keyboardDismissMode="on-drag">
@@ -114,7 +121,8 @@ function NoteEditor({ note, subjects, onSave, onDelete, onClose, colors }) {
     </Modal>
   );
 }
-
+// displaying a section of content that can be expanded or collapsed, 
+// with a header showing the title, symbol, count and an arrow indicating the state
 function CollapsibleSection({ title, symbol, count, children, colors, defaultOpen = true }) {
   const [open, setOpen] = useState(defaultOpen);
   return (
@@ -136,7 +144,8 @@ function CollapsibleSection({ title, symbol, count, children, colors, defaultOpe
     </View>
   );
 }
-
+// Define the styles for the CollapsibleSection and NoteEditor components using StyleSheet.create, 
+// including styles for the header, symbol, title, count badge, arrow, editor bar, buttons, text inputs, subject selection and footer
 const csStyles = StyleSheet.create({
   header: { flexDirection: 'row', alignItems: 'center', gap: 7, paddingVertical: spacing.sm, borderBottomWidth: 1, marginBottom: spacing.sm },
   symbol: { fontSize: 11 },
@@ -146,6 +155,7 @@ const csStyles = StyleSheet.create({
   arrow: { fontSize: 10 },
 });
 
+// Define the styles for the NoteEditor component using StyleSheet.create, including styles for the editor bar, buttons, text inputs, subject selection and footer
 const edStyles = StyleSheet.create({
   edBar: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: spacing.lg, paddingVertical: spacing.md, borderBottomWidth: 1 },
   edBarBtn: { padding: spacing.xs },
@@ -166,7 +176,7 @@ const edStyles = StyleSheet.create({
   edMeta: { fontSize: 11 },
 });
 
-
+// NotesScreen component for displaying and managing notes, with search, filtering and note editing functionality
 export default function NotesScreen() {
   const { state, dispatch } = useApp();
   const { colors } = useTheme();
@@ -194,11 +204,12 @@ export default function NotesScreen() {
   const filtered = notes.filter(n =>
     !search || n.title.toLowerCase().includes(search.toLowerCase()) || n.content.toLowerCase().includes(search.toLowerCase())
   );
-
+// Sort the filtered notes by updatedAt in descending order and take the first 5 as recentNotes, then separate the other notes into starredNotes and otherNotes
   const recentNotes = [...filtered].sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt)).slice(0, 5);
   const otherNotes = filtered.filter(n => !n.starred);
   const starredNotes  = filtered.filter(n => n.starred);
 
+  // Render a single note card with title, content preview, subject and date, allowing the user to open the note for editing or toggle its starred status
   const renderNote = (note) => {
     const subjectObj = subjects.find(s => s.name === note.subject);
     const accent = subjectObj?.color || colors.primary;
@@ -232,7 +243,7 @@ export default function NotesScreen() {
       </TouchableOpacity>
     );
   };
-
+// Render the main NotesScreen component with a header, search bar, collapsible sections for recent, starred and all notes and a floating action button for creating new notes
   return (
     <SafeAreaView style={[nStyles.safe, { backgroundColor: colors.bg }]} edges={['top']}>
       <ScrollView contentContainerStyle={nStyles.content} showsVerticalScrollIndicator={false}>
@@ -252,7 +263,7 @@ export default function NotesScreen() {
             <Text style={[nStyles.newBtnTxt, typography.heading, { color: colors.primaryLight }]}>+ new</Text>
           </TouchableOpacity>
         </View>
-
+{/* Render a message and button for creating a new note if there are no notes, otherwise render the search bar and collapsible sections for recent, starred and all notes */}
         {notes.length === 0 && (
           <View style={nStyles.bigEmpty}>
             <Text style={[nStyles.bigEmptySymbol, { color: colors.textLight }]}>○</Text>
@@ -356,39 +367,40 @@ export default function NotesScreen() {
     </SafeAreaView>
   );
 }
-
+// Define the styles for the NotesScreen component using StyleSheet.create, including styles for the safe area, content, header, title, count, 
+// new button, big empty state, search bar, note card and floating action button  
 const nStyles = StyleSheet.create({
-  safe:    { flex: 1 },
+  safe: { flex: 1 },
   content: { paddingHorizontal: spacing.lg, paddingTop: spacing.sm },
-  header:  { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: spacing.lg },
-  title:   { fontSize: 30 },
-  count:   { fontSize: 12, marginTop: 2 },
-  newBtn:  { paddingHorizontal: spacing.lg, paddingVertical: 9, borderRadius: radius.full, borderWidth: 1 },
+  header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: spacing.lg },
+  title: { fontSize: 30 },
+  count: { fontSize: 12, marginTop: 2 },
+  newBtn: { paddingHorizontal: spacing.lg, paddingVertical: 9, borderRadius: radius.full, borderWidth: 1 },
   newBtnTxt:{ fontSize: 14 },
 
-  bigEmpty:       { alignItems: 'center', paddingTop: 80, paddingBottom: 40, gap: spacing.md },
+  bigEmpty: { alignItems: 'center', paddingTop: 80, paddingBottom: 40, gap: spacing.md },
   bigEmptySymbol: { fontSize: 64, marginBottom: spacing.sm },
-  bigEmptyTitle:  { fontSize: 28 },
-  bigEmptySub:    { fontSize: 14, textAlign: 'center', lineHeight: 22 },
-  bigEmptyBtn:    { marginTop: spacing.md, paddingHorizontal: spacing.xl, paddingVertical: 12, borderRadius: radius.full, borderWidth: 1 },
+  bigEmptyTitle: { fontSize: 28 },
+  bigEmptySub: { fontSize: 14, textAlign: 'center', lineHeight: 22 },
+  bigEmptyBtn: { marginTop: spacing.md, paddingHorizontal: spacing.xl, paddingVertical: 12, borderRadius: radius.full, borderWidth: 1 },
   bigEmptyBtnTxt: { fontSize: 15 },
 
-  searchBar:   { flexDirection: 'row', alignItems: 'center', gap: 8, borderRadius: radius.md, borderWidth: 1, paddingHorizontal: spacing.md, height: 42, marginBottom: spacing.lg },
-  searchIcon:  { fontSize: 14 },
+  searchBar: { flexDirection: 'row', alignItems: 'center', gap: 8, borderRadius: radius.md, borderWidth: 1, paddingHorizontal: spacing.md, height: 42, marginBottom: spacing.lg },
+  searchIcon: { fontSize: 14 },
   searchInput: { flex: 1, fontSize: 14 },
 
-  noteCard:    { borderLeftWidth: 4, borderRadius: radius.md, borderWidth: 1, marginBottom: spacing.sm, overflow: 'hidden' },
-  noteBody:    { padding: spacing.md },
-  noteTopRow:  { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 5 },
-  noteTitle:   { fontSize: 14, flex: 1, marginRight: 8 },
-  starBtn:     { fontSize: 16 },
+  noteCard: { borderLeftWidth: 4, borderRadius: radius.md, borderWidth: 1, marginBottom: spacing.sm, overflow: 'hidden' },
+  noteBody: { padding: spacing.md },
+  noteTopRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 5 },
+  noteTitle: { fontSize: 14, flex: 1, marginRight: 8 },
+  starBtn: { fontSize: 16 },
   notePreview: { fontSize: 12, lineHeight: 18, marginBottom: spacing.sm },
-  noteFoot:    { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  noteDate:    { fontSize: 10 },
+  noteFoot: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+  noteDate: { fontSize: 10 },
   subjectPill: { flexDirection: 'row', alignItems: 'center', gap: 5, paddingHorizontal: 8, paddingVertical: 3, borderRadius: radius.full, borderWidth: 1 },
-  subjectDot:  { width: 6, height: 6, borderRadius: 3 },
-  subjectTxt:  { fontSize: 10, fontFamily: 'Nunito_600SemiBold' },
+  subjectDot: { width: 6, height: 6, borderRadius: 3 },
+  subjectTxt: { fontSize: 10, fontFamily: 'Nunito_600SemiBold' },
 
-  fab:    { position: 'absolute', bottom: 24, right: 24, width: 52, height: 52, borderRadius: 26, alignItems: 'center', justifyContent: 'center' },
+  fab: { position: 'absolute', bottom: 24, right: 24, width: 52, height: 52, borderRadius: 26, alignItems: 'center', justifyContent: 'center' },
   fabTxt: { fontSize: 28, color: '#fff', marginTop: -2 },
 });
