@@ -312,13 +312,13 @@ export default function CalendarScreen() {
               <Text style={[calS.navArrow, { color: accent }]}>→</Text>
             </TouchableOpacity>
           </View>
-// Day of the Week column headers 
+{/* Day of the Week column headers */}
           <View style={calS.dayHdrs}>
             {DAYS.map(d => (
               <Text key={d} style={[calS.dayHdr, { color: muted }]}>{d}</Text>
             ))}
           </View>
-// Monthly date grid: renders padding cells + date buttons 
+{/* Monthly date grid: renders padding cells + date buttons */}
           <View style={calS.grid}>
             {Array.from({ length: padDays }, (_, i) => <View key={`p${i}`} style={calS.cell} />)}
             {days.map(day => {
@@ -356,7 +356,7 @@ export default function CalendarScreen() {
               ? "TODAY'S ORDERS"
               : `ORDER #${format(parseISO(selected), 'd MMM').toUpperCase()}`}
           </Text>
-//  List of events scheduled for the selected date 
+{/* List of events scheduled for the selected date */}
           {selectedEvents.length > 0 ? (
             selectedEvents.map(ev => {
               const t = TYPE_MAP[ev.type] || TYPE_MAP.event;
@@ -483,7 +483,7 @@ export default function CalendarScreen() {
     </SafeAreaView>
   );
 }
-
+// Styles for the "Today's Orders" popup and its components
 const pop = StyleSheet.create({
   overlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.55)' },
   sheet: {
@@ -506,6 +506,7 @@ const pop = StyleSheet.create({
   closeHint:{ fontSize: 10, fontFamily: 'SpecialElite_400Regular', letterSpacing: 0.5 },
 });
 
+// Styles for the main calendar screen and its components
 const calS = StyleSheet.create({
   safe: { flex: 1 },
   content: { paddingHorizontal: 16, paddingTop: 12 },

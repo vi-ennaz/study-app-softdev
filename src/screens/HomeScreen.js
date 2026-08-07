@@ -1,3 +1,6 @@
+// HomeScreen.js
+// This file contains the main home screen of the app, which displays the user's study progress, streaks, and upcoming events. 
+// It uses React Native components and custom hooks for state management and theming.
 import React from 'react';
 import {
   View, Text, ScrollView, StyleSheet,
@@ -8,8 +11,10 @@ import { format } from 'date-fns';
 import { useApp } from '../context/AppContext';
 import { useTheme } from '../context/ThemeContext';
 
+// Get the width of the device window for responsive design
 const { width } = Dimensions.get('window');
 
+// Define a set of motivational quotes to display on the home screen
 const QUOTES = [
   'small progress is still progress.',
   'the best way to learn is to begin.',
@@ -20,14 +25,14 @@ const QUOTES = [
   "you don't have to be great to start.",
 ];
 
-// Room unlock milestones
+// Define a set of unlockable items that the user can earn by studying for a certain number of hours
 const UNLOCKS = [
   { hours: 5, label: 'Cozy Plant', emoji: '🪴' },
   { hours: 15, label: 'Warm Lamp', emoji: '💡' },
   { hours: 30, label: 'Coffee Machine', emoji: '☕' },
   { hours: 50, label: 'Bookshelf', emoji: '📚' },
 ];
-
+// Calculate the user's current streak of consecutive study days based on their session history
 function calcStreak(sessions) {
   if (!sessions?.length) return 0;
   const dates = [...new Set(sessions.map(s => s.date))].sort().reverse();
@@ -41,7 +46,7 @@ function calcStreak(sessions) {
   }
   return streak;
 }
-
+// Format a duration in minutes into a readable string 
 function fmtMins(m) {
   if (!m || m <= 0) return '0m';
   if (m < 60) return `${m}m`;
@@ -49,17 +54,19 @@ function fmtMins(m) {
   const rem = m % 60;
   return rem > 0 ? `${h}h ${rem}m` : `${h}h`;
 }
-
+// Determine the current time slot based on the hour of the day
 function getTimeSlot(h) {
   if (h >= 21 || h < 5) return 'night';
   if (h < 12) return 'morning';
   if (h < 17) return 'afternoon';
   return 'evening';
 }
-
+// Define greeting words and emojis for different times of the day
 const GREET_WORD = { night: 'good night', morning: 'good morning', afternoon: 'good afternoon', evening: 'good evening' };
+// Define greeting emojis for different times of the day
 const GREET_EMOJI = { night: '☾', morning: '☀', afternoon: '✦', evening: '☾⋆⁺₊' };
 
+// visual separation
 function Dashes({ color }) {
   return (
     <Text style={{ color: color || '#c0b4a4', fontSize: 10, letterSpacing: 0.5, textAlign: 'center', marginVertical: 8 }}>
@@ -67,7 +74,7 @@ function Dashes({ color }) {
     </Text>
   );
 }
-
+// displays a label-value pair in a row, with optional styling for bold text and muted colors
 function Row({ label, value, valueColor, bold, ink, muted }) {
   return (
     <View style={rc.row}>
@@ -76,11 +83,13 @@ function Row({ label, value, valueColor, bold, ink, muted }) {
     </View>
   );
 }
-
+// The main HomeScreen component that renders the user's study progress, streaks, and upcoming events
+// It uses the useApp and useTheme hooks to access the app state and theme settings, and displays various cards with information and actions for the user
 export default function HomeScreen({ navigation }) {
   const { state = {} } = useApp() || {};
   const { isDark = true, colors = {}, toggle: toggleTheme } = useTheme() || {};
 
+  // Destructure the relevant data from the app state, providing default values if they are not present
   const {
     sessions = [],
     events = [],
@@ -90,11 +99,12 @@ export default function HomeScreen({ navigation }) {
     profile = {},
   } = state;
 
+  // Get the current hour and determine the time slot for greeting purposes
   const hour = new Date().getHours();
   const timeSlot = getTimeSlot(hour);
   const today = format(new Date(), 'yyyy-MM-dd');
   const dayOfYear = Math.floor((Date.now() - new Date(new Date().getFullYear(), 0, 0)) / 86400000);
-
+// Filter the sessions to get only those that occurred today and calculate the total minutes studied today and overall
   const todaySessions = sessions.filter(s => s.date === today);
   const todayMins = todaySessions.reduce((a, s) => a + (s.durationMins || 0), 0);
   const totalMins = sessions.reduce((a, s) => a + (s.durationMins || 0), 0);
@@ -104,10 +114,11 @@ export default function HomeScreen({ navigation }) {
   const streak = calcStreak(sessions);
   const quote = QUOTES[dayOfYear % QUOTES.length];
 
-  // FIX: Properly calculate next unlock milestone
+// Find the next unlockable item based on the total hours studied and calculate how many hours are left to unlock it
   const nextUnlock = UNLOCKS.find(u => u.hours > totalHours) || null;
   const hoursLeft = nextUnlock ? (nextUnlock.hours - totalHours).toFixed(1) : null;
 
+  // Find the next upcoming event that is not done and is scheduled for today or later and calculate how many days are left until it occurs
   const upcomingEvent = events
     .filter(e => !e.done && e.date >= today)
     .sort((a, b) => a.date.localeCompare(b.date))[0];
@@ -115,10 +126,12 @@ export default function HomeScreen({ navigation }) {
     ? Math.max(0, Math.ceil((new Date(upcomingEvent.date) - new Date()) / 86400000))
     : null;
 
+  // Calculate the progress bar representation based on the goal percentage and define colors for the theme
   const BAR_LEN = 18;
   const filled = Math.round((goalPct / 100) * BAR_LEN);
   const progress = '█'.repeat(filled) + '░'.repeat(BAR_LEN - filled);
 
+  // Define colors for the background, paper, ink, muted text, accent, and border based on the current theme 
   const bg = isDark ? '#21201f' : '#faf5ee';
   const paper = isDark ? '#2e2c2a' : '#fffdf7';
   const ink = isDark ? '#d1c9bb' : '#1e160a';
@@ -127,6 +140,8 @@ export default function HomeScreen({ navigation }) {
   const border = isDark ? '#3d3a36' : '#c8bfb0';
   const receiptDate = format(new Date(), 'dd MMM yyyy  HH:mm');
 
+  // navigate to different screens or perform action
+  // It accepts children components and styles as props
   const Card = ({ onPress, children, style }) => {
     const inner = (
       <View style={[rc.card, { backgroundColor: paper, borderColor: border }, style]}>
