@@ -127,7 +127,7 @@ function EventModal({ initial, subjects, onSave, onDelete, onClose, colors, bord
     { text: 'Cancel', style: 'cancel' },
     { text: 'Delete', style: 'destructive', onPress: () => { onDelete(); onClose(); } },
   ]);
-
+// Renders the modal window for creating or editing a calendar event, including input fields for title, subject, date, time and category selection
   return (
     <Modal visible animationType="slide" transparent onRequestClose={onClose}>
       <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
