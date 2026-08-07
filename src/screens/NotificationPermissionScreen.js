@@ -1,7 +1,14 @@
+// NotificationPermissionScreen.js
+// This screen is displayed to the user when the app needs to request notification permissions
+// It provides a brief explanation of why notifications are important and offers buttons to allow or skip notifications
+// The onDone callback is called when the user makes a choice, allowing the parent component to handle the result
+
+// Import necessary modules from React and React Native, including View, Text, TouchableOpacity, StyleSheet and SafeAreaView
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+// Define the NotificationPermissionScreen component, which takes an onDone prop to handle the user's choice
 export default function NotificationPermissionScreen({ onDone }) {
   return (
     <SafeAreaView style={styles.safe}>
@@ -20,7 +27,7 @@ export default function NotificationPermissionScreen({ onDone }) {
     </SafeAreaView>
   );
 }
-
+// Define the styles for the NotificationPermissionScreen component using StyleSheet.create, including styles for the safe area, content, icon, heading, body, allow button and skip button
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: '#0a0a0a' },
   content: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 36 },
