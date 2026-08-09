@@ -1,4 +1,6 @@
-// src/screens/ProfileScreen.js
+// ProfileScreen.js
+// This screen displays the user's profile information, including their name, username, bio, school, year level, privacy settings, study stats, badges and recent sessions
+// It also allows the user to edit their profile information and manage their connections
 import React, { useState } from 'react';
 import {
   View, Text, ScrollView, StyleSheet, TouchableOpacity,
@@ -11,20 +13,20 @@ import { useTheme } from '../context/ThemeContext';
 import { typography, spacing, radius } from '../theme';
 import { format } from 'date-fns';
 
-
+// Define the EditProfileModal component, which allows the user to edit their profile information such as name, username, bio, school and year
 function EditProfileModal({ profile, onSave, onClose, colors }) {
   const [name, setName] = useState(profile.name || '');
   const [username, setUsername] = useState(profile.username || '');
   const [bio, setBio] = useState(profile.bio || '');
   const [school, setSchool] = useState(profile.school || '');
   const [year, setYear] = useState(profile.year|| '');
-
+// Define the save function, which validates the name field and calls the onSave callback with the updated profile information, then closes the modal
   const save = () => {
     if (!name.trim()) { Alert.alert('Name required'); return; }
     onSave({ name, username, bio, school, year });
     onClose();
   };
-
+// Define the inputStyle variable, which combines the editInput style with typography and colour styles based on the current theme
   const inputStyle = [pStyles.editInput, typography.body, { backgroundColor: colors.card, borderColor: colors.border, color: colors.text }];
 
   return (
@@ -42,6 +44,8 @@ function EditProfileModal({ profile, onSave, onClose, colors }) {
           </View>
           <ScrollView contentContainerStyle={pStyles.editContent} keyboardDismissMode="on-drag">
             {[
+              // Define an array of fields to be displayed in the edit profile modal, each with a label, value, 
+              // setter function and placeholder text
               { label: 'display name', val: name, set: setName, ph: 'your name' },
               { label: 'username', val: username, set: setUsername, ph: '@handle' },
               { label: 'school', val: school, set: setSchool, ph: 'school name' },
@@ -69,16 +73,19 @@ function EditProfileModal({ profile, onSave, onClose, colors }) {
   );
 }
 
+// Define the ConnectionsModal component, which allows the user to view and manage their connections, 
+// requests and suggested connections
 function ConnectionsModal({ profile, dispatch, onClose, tab: initTab, colors }) {
   const [tab, setTab] = useState(initTab || 'connections');
-
+// Define the removeConnection function, which displays a confirmation alert 
+// before dispatching an action to remove a connection from the user's profile
   const removeConnection = (username) => {
     Alert.alert('Remove connection?', `Remove ${username}?`, [
       { text: 'Cancel', style: 'cancel' },
       { text: 'Remove', style: 'destructive', onPress: () => dispatch({ type: 'REMOVE_CONNECTION', payload: username }) },
     ]);
   };
-
+// Define the MOCK_USERS array, which contains some sample user data for testing purposes
   return (
     <Modal visible animationType="slide" onRequestClose={onClose}>
       <SafeAreaView style={[pStyles.editSafe, { backgroundColor: colors.bg }]}>
@@ -100,7 +107,8 @@ function ConnectionsModal({ profile, dispatch, onClose, tab: initTab, colors }) 
             </TouchableOpacity>
           ))}
         </View>
-
+{/* Define the main content of the ConnectionsModal, */}
+{/* which displays different views based on the selected tab (connections, requests or find) */}
         <ScrollView contentContainerStyle={{ padding: spacing.lg }}>
           {tab === 'connections' && (
             profile.connections.length === 0 ? (
@@ -127,7 +135,8 @@ function ConnectionsModal({ profile, dispatch, onClose, tab: initTab, colors }) 
               );
             })
           )}
-
+{/* Define the content for the 'requests' tab, which displays pending connection requests .*/}
+{/* and allows the user to accept or decline them */}
           {tab === 'requests' && (
             profile.requests.length === 0 ? (
               <View style={pStyles.connEmpty}>
@@ -158,7 +167,7 @@ function ConnectionsModal({ profile, dispatch, onClose, tab: initTab, colors }) 
               );
             })
           )}
-
+{/* Define the content for the 'find' tab, which displays suggested connections that the user can send connection requests to */}
           {tab === 'find' && (
             <>
               <Text style={[pStyles.findTitle, typography.caption, { color: colors.textMuted }]}>suggested connections</Text>
@@ -186,6 +195,8 @@ function ConnectionsModal({ profile, dispatch, onClose, tab: initTab, colors }) 
   );
 }
 
+// Define the main ProfileScreen component, which displays the user's profile information 
+// and allows them to edit it or manage their connections
 export default function ProfileScreen({ navigation }) {
   const { state, dispatch } = useApp();
   const { colors }= useTheme();
@@ -204,6 +215,7 @@ export default function ProfileScreen({ navigation }) {
     }
   };
 
+  // Calculate today's date and the total minutes studied today and overall, as well as the total hours studied
   const today = format(new Date(), 'yyyy-MM-dd');
   const todayMins = sessions.filter(s => s.date === today).reduce((sum, s) => sum + s.durationMins, 0);
   const totalMins = sessions.reduce((sum, s) => sum + s.durationMins, 0);
@@ -223,7 +235,7 @@ export default function ProfileScreen({ navigation }) {
             <Text style={[pStyles.editBtnTxt, typography.body, { color: colors.primary }]}>edit</Text>
           </TouchableOpacity>
         </View>
-
+{/* Define the top section of the profile screen, which displays the user's avatar, name, username, school and year level */}
         <View style={pStyles.profileTop}>
           <TouchableOpacity onPress={pickPhoto} style={pStyles.avatarWrap}>
             {profile.photoUri ? (
@@ -249,7 +261,7 @@ export default function ProfileScreen({ navigation }) {
             ) : null}
           </View>
         </View>
-
+{/* Define the bio section of the profile screen, which displays the user's bio if it exists or a prompt to add a bio if it doesn't */}
         {profile.bio ? (
           <Text style={[pStyles.bio, typography.body, { color: colors.textMid }]}>{profile.bio}</Text>
         ) : (
@@ -257,7 +269,8 @@ export default function ProfileScreen({ navigation }) {
             <Text style={[pStyles.bioEmpty, typography.body, { color: colors.textLight }]}>+ add a bio...</Text>
           </TouchableOpacity>
         )}
-
+{/* Define the privacy settings section of the profile screen, which displays whether the user's account is private 
+or public and allows them to toggle the setting */}
         <View style={[pStyles.privacyRow, { backgroundColor: colors.card, borderColor: colors.border }]}>
           <View>
             <Text style={[pStyles.privacyLabel, typography.subheading, { color: colors.text }]}>
@@ -274,7 +287,8 @@ export default function ProfileScreen({ navigation }) {
             thumbColor={profile.isPrivate ? colors.primary : colors.textMuted}
           />
         </View>
-
+{/* Define the stats section of the profile screen, which displays the user's number of connections, 
+pending requests and current day streak */}
         <View style={[pStyles.statsRow, { borderTopColor: colors.border, borderBottomColor: colors.border }]}>
           <TouchableOpacity style={pStyles.statItem} onPress={() => openConns('connections')}>
             <Text style={[pStyles.statNum, typography.display, { color: colors.text }]}>{profile.connections.length}</Text>
@@ -293,7 +307,7 @@ export default function ProfileScreen({ navigation }) {
             <Text style={[pStyles.statLabel, typography.caption, { color: colors.textMuted }]}>day streak</Text>
           </View>
         </View>
-
+{/* Define the action buttons section of the profile screen, which allows the user to edit their profile or find new connections */}
         <View style={pStyles.actionRow}>
           <TouchableOpacity style={[pStyles.actionBtn, { backgroundColor: colors.card, borderColor: colors.border }]} onPress={() => setShowEdit(true)}>
             <Text style={[pStyles.actionBtnTxt, typography.subheading, { color: colors.textMid }]}>edit profile</Text>
@@ -306,12 +320,12 @@ export default function ProfileScreen({ navigation }) {
         <Text style={[pStyles.sectionHeader, typography.caption, { color: colors.textMuted }]}>◆  study stats</Text>
         <ScrollView horizontal showsHorizontalScrollIndicator={false} style={pStyles.highlightsRow}>
           {[
-            { label: 'total', value: totalH > 0 ? `${totalH}h` : '0m', sub: 'hours studied'   },
+            { label: 'total', value: totalH > 0 ? `${totalH}h` : '0m', sub: 'hours studied' },
             { label: 'today', value: todayMins > 0 ? `${Math.floor(todayMins/60) > 0 ? Math.floor(todayMins/60)+'h ' : ''}${todayMins%60}m` : '0m', sub: 'today' },
-            { label: 'sessions', value: String(sessions.length), sub: 'sessions'       },
-            { label: 'notes', value: String(notes.length),    sub: 'notes'          },
-            { label: 'badges', value: `${rewards.unlockedBadges.length}/13`, sub: 'unlocked' },
-            { label: 'waves', value: String(rewards.waveCount), sub: 'wave sessions' },
+            { label: 'sessions', value: String(sessions.length), sub: 'sessions'},
+            { label: 'notes', value: String(notes.length),    sub: 'notes' },
+            { label: 'badges', value: `${rewards.unlockedBadges.length}/13`, sub: 'unlocked'},
+            { label: 'waves', value: String(rewards.waveCount), sub: 'wave sessions'},
           ].map(h => (
             <View key={h.label} style={pStyles.highlight}>
               <View style={[pStyles.highlightCircle, { borderColor: colors.primary, backgroundColor: colors.primaryPale }]}>
@@ -321,7 +335,8 @@ export default function ProfileScreen({ navigation }) {
             </View>
           ))}
         </ScrollView>
-
+{/* Define the badges section of the profile screen, which displays the user's unlocked badges */} 
+{/* or a prompt to start studying if they have none */}
         <Text style={[pStyles.sectionHeader, typography.caption, { color: colors.textMuted }]}>★  badges</Text>
         {rewards.unlockedBadges.length === 0 ? (
           <View style={[pStyles.emptyBadges, { backgroundColor: colors.card, borderColor: colors.border }]}>
@@ -344,7 +359,8 @@ export default function ProfileScreen({ navigation }) {
             })}
           </View>
         )}
-
+{/* Define the recent sessions section of the profile screen, which displays the user's most recent study sessions */}
+{/* or a prompt to start studying if they have none */}
         <Text style={[pStyles.sectionHeader, typography.caption, { color: colors.textMuted }]}>≋  recent sessions</Text>
         {sessions.length === 0 ? (
           <View style={pStyles.emptyPosts}>
@@ -367,7 +383,8 @@ export default function ProfileScreen({ navigation }) {
 
         <View style={{ height: 80 }} />
       </ScrollView>
-
+{/* Render the EditProfileModal and ConnectionsModal components conditionally based on the showEdit 
+and showConns state variables, passing the necessary props to each modal */}
       {showEdit && (
         <EditProfileModal
           profile={profile}
@@ -388,7 +405,9 @@ export default function ProfileScreen({ navigation }) {
     </SafeAreaView>
   );
 }
-
+// Define the styles for the ProfileScreen component using StyleSheet.create, 
+// including styles for the safe area, content, top bar, profile top section, avatar, profile info, bio, privacy row, stats row, action buttons, 
+// highlights row, badges grid and recent sessions grid
 const pStyles = StyleSheet.create({
   safe: {flex: 1 },
   content: {paddingBottom: 40 },
