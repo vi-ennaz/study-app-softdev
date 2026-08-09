@@ -1,3 +1,10 @@
+// RewardsScreen.js
+// This screen displays the user's rewards, including their streak, badges
+// and progress along the milestone path. 
+// It provides an overview of the user's achievements and allows them to view details about their unlocked badges.
+
+// Import necessary modules from React and React Native, including View, Text, ScrollView, StyleSheet, TouchableOpacity, 
+// Modal, Dimensions and Animated
 import { Image } from 'react-native';
 import React, { useState, useRef, useEffect } from 'react';
 import {
@@ -10,10 +17,13 @@ import { useApp, BADGES } from '../context/AppContext';
 import { useTheme } from '../context/ThemeContext';
 import { typography, spacing, radius } from '../theme';
 
-
+// Define the RewardsScreen component, which displays the user's rewards, 
+// including their streak, badges and progress along the milestone path
 const { width } = Dimensions.get('window');
 const DAYS = ['Su','Mo','Tu','We','Th','Fr','Sa'];
 
+// Define the XPBar component, which displays a progress bar 
+// indicating the user's current experience points (XP) relative to the maximum XP required for the next milestone
 function XPBar({ current, max, color }) {
   const pct = Math.min(current / Math.max(max, 1), 1);
   return (
@@ -27,10 +37,10 @@ const xp = StyleSheet.create({
   fill: { height: '100%', borderRadius: 7 },
 });
 
-
+// Define the StreakCalendar component, which displays a calendar view of the user's study streak for the current month
 function StreakCalendar({ streakDates, colors }) {
   const now = new Date();
-  const year  = now.getFullYear();
+  const year = now.getFullYear();
   const month = now.getMonth();
   const dim = new Date(year, month + 1, 0).getDate();
   const first = new Date(year, month, 1).getDay();
@@ -44,6 +54,7 @@ function StreakCalendar({ streakDates, colors }) {
   }
   return (
     <View>
+      {/* Define the header row of the calendar, which displays the days of the week */}
       <View style={cal.dayRow}>
         {DAYS.map(d => <Text key={d} style={[cal.dayHdr, { color: colors.textMuted }]}>{d}</Text>)}
       </View>
@@ -70,6 +81,8 @@ function StreakCalendar({ streakDates, colors }) {
     </View>
   );
 }
+// Define the styles for the StreakCalendar component using StyleSheet.create, 
+// including styles for the day row, day header, grid, cell wrapper, cell and cell number
 const cal = StyleSheet.create({
   dayRow: { flexDirection: 'row', marginBottom: 4 },
   dayHdr: { flex: 1, fontSize: 9, textAlign: 'center', fontFamily: 'Nunito_700Bold' },
@@ -79,6 +92,8 @@ const cal = StyleSheet.create({
   cellNum: { fontSize: 10 },
 });
 
+// Define the MilestonePath component, which displays the user's progress along 
+// the milestone path based on their total study hours
 function MilestonePath({ sessions, colors }) {
   const totalMins = sessions.reduce((s, x) => s + x.durationMins, 0);
   const totalH    = Math.floor(totalMins / 60);
@@ -93,6 +108,8 @@ function MilestonePath({ sessions, colors }) {
   const cur = milestones.filter(m => totalH >= m.h).length - 1;
   const nxt = milestones[Math.min(cur + 1, milestones.length - 1)];
 
+  // Define the render function for the MilestonePath component, 
+  // which returns a view containing the milestone nodes, labels and progress bar
   return (
     <View>
       <View style={path.row}>
@@ -124,6 +141,8 @@ function MilestonePath({ sessions, colors }) {
     </View>
   );
 }
+// Define the styles for the MilestonePath component using StyleSheet.create,
+// including styles for the row, step, node, label, hours, total and next text
 const path = StyleSheet.create({
   row: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: spacing.md },
   step: { alignItems: 'center', flex: 1 },
@@ -133,7 +152,9 @@ const path = StyleSheet.create({
   total: { fontSize: 14, marginBottom: 5 },
   next: { fontSize: 10 },
 });
-
+// Define the BadgeModal component, which displays information about a specific badge
+// It is shown as a modal overlay when the user taps on a badge in the RewardsScreen
+// The modal includes the badge's icon, title, description and an "unlocked" pill if the badge has been unlocked
 function BadgeModal({ badge, onClose, colors }) {
   if (!badge) return null;
   return (
@@ -154,6 +175,10 @@ function BadgeModal({ badge, onClose, colors }) {
     </Modal>
   );
 }
+// Define the styles for the BadgeModal component using StyleSheet.create,
+// including styles for the card, icon, title, description, pill and pill text
+// The card style includes a border radius, padding, alignment and width, 
+// while the icon style sets the font size and colour. 
 const bm = StyleSheet.create({
   card: { borderRadius: 28, padding: 36, alignItems: 'center', width: width * 0.78, borderWidth: 1 },
   icon: { fontSize: 56, color: '#6aaff0', marginBottom: 12 },
@@ -163,6 +188,7 @@ const bm = StyleSheet.create({
   pillTxt: { fontSize: 14 },
 });
 
+// Define the RewardsScreen component, which displays the user's rewards and progress
 export default function RewardsScreen() {
   const { state } = useApp();
   const { colors } = useTheme();
@@ -201,7 +227,8 @@ export default function RewardsScreen() {
     resizeMode: 'contain',
   }}
 />
-
+{/* Define the center section of the banner, which displays the user's current streak, */}
+{/* league and progress towards their daily goal */}
           <View style={rw.bannerCenter}>
             <Text style={[rw.bannerTitle, { color: '#fff' }]}>
               {streak > 0 ? `${streak} day streak!` : 'Start your streak!'}
@@ -227,7 +254,7 @@ export default function RewardsScreen() {
             <Text style={[rw.bigStreakLabel, { color: 'rgba(255,255,255,0.8)' }]}>days</Text>
           </View>
         </View>
-
+{/* Define the stats row, which displays the user's total study hours, streak, number of unlocked badges and number of study sessions */}
         <View style={[rw.statsRow, { backgroundColor: colors.card, borderColor: colors.border }]}>
           {[
             { val: `${totalH}h`, lbl: 'total', color: colors.water    },
@@ -244,7 +271,7 @@ export default function RewardsScreen() {
             </React.Fragment>
           ))}
         </View>
-
+{/* Define the tabs section, which allows the user to switch between the "Overview", "Badges" and "Path" tabs */}
         <View style={[rw.tabs, { backgroundColor: colors.surface, borderColor: colors.border }]}>
           {[
             { id: 'overview', label: 'OVERVIEW'},
@@ -259,7 +286,7 @@ export default function RewardsScreen() {
             </TouchableOpacity>
           ))}
         </View>
-
+{/* Define the content section of the RewardsScreen, which displays different content based on the selected tab */}
         {tab === 'overview' && (
           <>
             <View style={[rw.card, { backgroundColor: colors.card, borderColor: colors.border }]}>
@@ -271,6 +298,8 @@ export default function RewardsScreen() {
                   <Text style={[rw.streakPillTxt, { color: colors.primaryLight }]}>{streak} days</Text>
                 </View>
               </View>
+
+    {/* Render the StreakCalendar component, passing in the user's streak dates and theme colors as props */}
               <StreakCalendar streakDates={rewards.streakDates || []} colors={colors} />
               <View style={rw.calLegend}>
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
@@ -283,7 +312,7 @@ export default function RewardsScreen() {
                 </View>
               </View>
             </View>
-
+{/* Render the MilestonePath component, passing in the user's study sessions and theme colors as props */}
             <View style={[rw.bearMsg, { backgroundColor: colors.card, borderColor: colors.borderGlow }]}>
               <Image
                 source={require('../../assets/iconreward.png')}
@@ -305,6 +334,9 @@ export default function RewardsScreen() {
                   : `${streak}-day streak ◆`}
               </Text>
             </View>
+
+        {/* Render the Streak Freeze section if the user's streak is 7 days or more, 
+        // indicating that their streak is protected for one missed day */}
             {streak >= 7 && (
               <View style={[rw.freeze, { backgroundColor: colors.waterPale, borderColor: colors.borderGlow }]}>
                 <Text style={{ fontSize: 22 }}>Cold</Text>
@@ -323,12 +355,16 @@ export default function RewardsScreen() {
                   This week
               </Text>
               {(() => {
+                // Calculate the total study minutes for each of the last 7 days 
+                // and create an array of objects containing the day label, total minutes and whether it is today
                 const days7 = Array.from({ length: 7 }, (_, i) => {
                   const d = new Date(); d.setDate(d.getDate() - (6 - i));
                   const ds = format(d, 'yyyy-MM-dd');
                   const mins = sessions.filter(s => s.date === ds).reduce((sum, s) => sum + s.durationMins, 0);
                   return { label: DAYS[d.getDay()], mins, isToday: ds === today };
                 });
+                // Calculate the maximum study minutes for the last 7 days, 
+                // ensuring a minimum of 60 minutes for scaling the bar heights
                 const maxM = Math.max(...days7.map(d => d.mins), 60);
                 return (
                   <View style={{ flexDirection: 'row', height: 60, alignItems: 'flex-end', justifyContent: 'space-between' }}>
@@ -353,7 +389,7 @@ export default function RewardsScreen() {
             </View>
           </>
         )}
-
+ {/* Define the content for the "Badges" tab, which displays the user's unlocked and locked badges */}
         {tab === 'badges' && (
           <>
 
@@ -376,7 +412,7 @@ export default function RewardsScreen() {
                 </View>
               </>
             )}
-
+{/* Render the locked badges section if there are any locked badges, displaying them with a lock icon and reduced opacity */}
             {locked.length > 0 && (
               <>
                 <Text style={[rw.groupLbl, typography.caption, { color: colors.textMuted, marginTop: spacing.lg }]}>
@@ -395,7 +431,7 @@ export default function RewardsScreen() {
                 </View>
               </>
             )}
-
+{/* Render a message indicating that there are no unlocked badges if the user has not unlocked any badges yet */}
             {unlocked.length === 0 && (
               <View style={[rw.emptyBadge, { backgroundColor: colors.card, borderColor: colors.border }]}>
                 <Image
@@ -416,7 +452,7 @@ export default function RewardsScreen() {
             )}
           </>
         )}
-
+{/* Define the content for the "Path" tab, which displays the user's progress along the milestone path and their session history */}
         {tab === 'path' && (
           <>
             <View style={[rw.card, { backgroundColor: colors.card, borderColor: colors.border }]}>
@@ -426,6 +462,7 @@ export default function RewardsScreen() {
               <MilestonePath sessions={sessions} colors={colors} />
             </View>
 
+{/* Render the session history section, displaying the user's last 10 study sessions with details such as subject, date and duration */}
             <View style={[rw.card, { backgroundColor: colors.card, borderColor: colors.border }]}>
               <Text style={[rw.cardTitle, typography.heading, { color: colors.text, marginBottom: spacing.md }]}>
                  session history
@@ -451,7 +488,7 @@ export default function RewardsScreen() {
             </View>
           </>
         )}
-
+{/* Add some spacing at the bottom of the ScrollView to ensure that the content is not cut off */}
         <View style={{ height: 90 }} />
       </ScrollView>
 
@@ -459,7 +496,9 @@ export default function RewardsScreen() {
     </SafeAreaView>
   );
 }
-
+// Define the styles for the RewardsScreen component using StyleSheet.create,
+// including styles for the safe area, content, banner, stats row, tabs, cards, badges and session history
+// The styles include properties such as flex direction, padding, margin, font size, font family, border radius and colours 
 const rw = StyleSheet.create({
   safe: { flex: 1 },
   content: { paddingHorizontal: spacing.lg, paddingTop: 0 },
