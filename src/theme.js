@@ -1,3 +1,5 @@
+// Define the color palettes for dark and light themes, 
+// including background, surface, card, border, text, primary, water, slate, success, danger, warning and white colors
 export const darkColors = {
   bg: '#111111',
   surface: '#1a1a1a',
@@ -26,7 +28,8 @@ export const darkColors = {
   warning: '#ccb895',
   white:'#ffffff',
 };
-
+// Define the color palette for the light theme, including background, surface, card, border, text, primary, 
+// water, slate, success, danger, warning and white colors
 export const lightColors = {
   bg: '#f8f8f6',
   surface: '#ffffff',
@@ -55,7 +58,8 @@ export const lightColors = {
   warning: '#c87800',
   white: '#ffffff',
 };
-
+// Export the darkColors object as the default export for this module, 
+// allowing other parts of the application to import and use the dark theme colors
 export const typography = {
   display: { fontFamily: 'Nunito_800ExtraBold' },
   heading: { fontFamily: 'Nunito_700Bold' },
@@ -67,6 +71,8 @@ export const typography = {
   mono: { fontFamily: 'Nunito_700Bold', letterSpacing: 2 },
 };
 
+// Export the darkColors object as the default export for this module, 
+// allowing other parts of the application to import and use the dark theme colors
 export const spacing = {
   xs: 4,
   sm: 8,
@@ -75,7 +81,8 @@ export const spacing = {
   xl: 28,
   xxl: 40,
 };
-
+// Export the darkColors object as the default export for this module, 
+// allowing other parts of the application to import and use the dark theme colours
 export const radius = {
   sm: 8,
   md: 12,
@@ -83,7 +90,6 @@ export const radius = {
   xl: 24,
   full: 999,
 };
-
 export const shadow = {
   glow: {
     shadowColor: '#4a90d9',
@@ -100,5 +106,6 @@ export const shadow = {
     elevation: 10,
   },
 };
-
+// Export the darkColors object as the default export for this module, 
+// allowing other parts of the application to import and use the dark theme colours
 export const colors = darkColors;
