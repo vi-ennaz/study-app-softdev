@@ -1,3 +1,8 @@
+// src/lib/supabase.js
+// This file sets up the Supabase client for the app, 
+// allowing it to interact with the Supabase backend for authentication, database operations and other services. 
+// It uses the createClient function from the @supabase/supabase-js package to create a Supabase client instance with the provided URL and anonymous key. 
+// The client is configured to use AsyncStorage for session persistence and automatic token refresh.
 import { createClient } from '@supabase/supabase-js';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 

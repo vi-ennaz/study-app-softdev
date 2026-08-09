@@ -1,16 +1,25 @@
+// src/components/UI.js
+// This file contains reusable UI components for the app, including Card, 
+// GlowCard, SubjectTag, ProgressBar, Pill, EmptyState, DividerLine and SectionLabel.
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { colors, typography, spacing, radius, shadow } from '../theme';
 
+// Define the Card component, which renders a card-like container with optional onPress functionality
+// If onPress is provided, the card becomes a TouchableOpacity, otherwise it is a simple View
 export function Card({ children, style, onPress }) {
   if (onPress) return <TouchableOpacity onPress={onPress} activeOpacity={0.82} style={[styles.card,shadow.sm,style]}>{children}</TouchableOpacity>;
   return <View style={[styles.card,shadow.sm,style]}>{children}</View>;
 }
+// Define the GlowCard component, which renders a card-like container with a glowing shadow effect
+// The glowColor prop allows customization of the glow color, defaulting to the primary colour from the theme
 export function GlowCard({ children, style, onPress, glowColor=colors.primary }) {
   const glow={ shadowColor:glowColor, shadowOffset:{width:0,height:0}, shadowOpacity:0.22, shadowRadius:14, elevation:8 };
   if (onPress) return <TouchableOpacity onPress={onPress} activeOpacity={0.82} style={[styles.card,glow,{borderColor:glowColor+'28'},style]}>{children}</TouchableOpacity>;
   return <View style={[styles.card,glow,{borderColor:glowColor+'28'},style]}>{children}</View>;
 }
+// Define the SubjectTag component, which renders a small tag-like element displaying a subject name
+// The subject prop determines the background and text color of the tag based on a predefined mapping
 export function SubjectTag({ subject }) {
   const MAP={
     General:{bg:'#1e3248',text:'#7ab0cc'}, Maths:{bg:'#1e3a28',text:'#6ab888'},
@@ -22,6 +31,8 @@ export function SubjectTag({ subject }) {
   const c=MAP[subject]||MAP.General;
   return <View style={[styles.subjTag,{backgroundColor:c.bg}]}><Text style={[styles.subjTagText,typography.caption,{color:c.text}]}>{subject}</Text></View>;
 }
+// Define the ProgressBar component, which renders a horizontal progress bar indicating completion percentage
+// The progress prop determines the fill percentage, while color and height can be customised through props
 export function ProgressBar({ progress, color=colors.primary, height=8, style }) {
   return (
     <View style={[styles.progTrack,{height},style]}>
@@ -29,6 +40,8 @@ export function ProgressBar({ progress, color=colors.primary, height=8, style })
     </View>
   );
 }
+// Define the Pill component, which renders a pill-shaped button-like element with a label
+// The active prop determines the styling of the pill, while onPress handles user interaction
 export function Pill({ label, active, onPress, color=colors.primary }) {
   return (
     <TouchableOpacity onPress={onPress} activeOpacity={0.8} style={[styles.pill, active&&{backgroundColor:color+'22',borderColor:color+'70'}]}>
@@ -36,6 +49,8 @@ export function Pill({ label, active, onPress, color=colors.primary }) {
     </TouchableOpacity>
   );
 }
+// Define the EmptyState component, which renders a placeholder view indicating an empty state in the UI
+// It displays a symbol, title and optional subtitle to inform the user about the empty state
 export function EmptyState({ symbol='◇', title, subtitle }) {
   return (
     <View style={styles.empty}>
@@ -45,6 +60,8 @@ export function EmptyState({ symbol='◇', title, subtitle }) {
     </View>
   );
 }
+// Define the DividerLine component, which renders a horizontal line 
+// used to separate content sections in the UI
 export function DividerLine() { return <View style={styles.divider} />; }
 export function SectionLabel({ text, symbol='◆' }) {
   return (
@@ -54,7 +71,8 @@ export function SectionLabel({ text, symbol='◆' }) {
     </View>
   );
 }
-
+// Define the styles for the UI components using StyleSheet.create, including styles for card, 
+// subject tag, progress bar, pill, empty state, divider line and section label
 const styles=StyleSheet.create({
   card:{ backgroundColor:colors.card, borderRadius:radius.lg, padding:spacing.lg, borderWidth:1, borderColor:colors.border },
   subjTag:{ paddingHorizontal:9, paddingVertical:3, borderRadius:radius.full, alignSelf:'flex-start' },
