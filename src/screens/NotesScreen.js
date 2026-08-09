@@ -1,3 +1,9 @@
+// NotesScreen.js
+// This file contains the main notes screen for the Study Cafe app, 
+// which allows users to view, create, edit, and manage their notes. 
+// The screen features a list of notes organized into sections for recent, starred and all notes. 
+// It also includes a search bar for filtering notes by title or content
+// and a modal for creating/editing notes.
 import React, { useState, useRef } from 'react';
 import {
   View, Text, ScrollView, StyleSheet, TouchableOpacity, TextInput,

@@ -1,6 +1,6 @@
-// Authentication screen
-// Overview: 
-
+// AuthScreen.js
+// This file contains the authentication screen for the app, which allows users to log in, sign up, or reset their password. 
+// It uses React Native components and Supabase for authentication services.
 
 // imports react and usestate which allows to create and update variables 
 // that stores info while app is running

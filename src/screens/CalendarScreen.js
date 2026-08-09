@@ -1,3 +1,8 @@
+// CalendarScreen.js
+// This file contains the main calendar screen for the Study Cafe app, 
+// which allows users to view, create, edit, and manage their study-related events and deadlines. 
+// The screen features a monthly calendar view, a list of events for the selected date
+// and a summary of upcoming events. It also includes modals for adding/editing events and a popup for today's orders.
 import React, { useState, useEffect } from 'react';
 import {
   View, Text, ScrollView, StyleSheet, TouchableOpacity,
